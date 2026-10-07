@@ -1,0 +1,7 @@
+/build/
+/.cache/
+*.pcap
+*.h264
+*.mp4
+.idea/
+.vscode/

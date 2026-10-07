@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-build-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain and GStreamer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config g++ clang libgstreamer1.0-dev gstreamer1.0-tools gstreamer1.0-plugins-base
+      - name: Configure
+        env:
+          CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DMEDIA_ENABLE_SANITIZERS=ON
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Exercise GStreamer pipeline
+        run: ./build/gstreamer-pipeline-probe
+      - name: Check CLI help
+        run: ./build/rtp-diagnostics --help
