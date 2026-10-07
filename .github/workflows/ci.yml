@@ -34,3 +34,12 @@ jobs:
         run: ./build/gstreamer-pipeline-probe
       - name: Check CLI help
         run: ./build/rtp-diagnostics --help
+
+  container-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build verification image
+        run: docker build --tag rtp-media-pipeline-diagnostics:ci .
+      - name: Run container CLI
+        run: docker run --rm rtp-media-pipeline-diagnostics:ci --help
