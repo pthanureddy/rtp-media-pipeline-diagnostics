@@ -15,7 +15,7 @@ jobs:
       matrix:
         compiler: [gcc, clang]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install toolchain and GStreamer
         run: |
           sudo apt-get update
@@ -27,7 +27,9 @@ jobs:
       - name: Build
         run: cmake --build build --parallel
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: |
+          ./build/media-diagnostics-tests
+          ctest --test-dir build --output-on-failure
       - name: Exercise GStreamer pipeline
         run: ./build/gstreamer-pipeline-probe
       - name: Check CLI help
